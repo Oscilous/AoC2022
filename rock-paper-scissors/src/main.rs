@@ -17,11 +17,20 @@ impl Move {
         }
     }
 }
+
+enum Result {
+    Loss,
+    Draw,
+    Victory,
+}
+
 fn main() {
     let contents: String =
         fs::read_to_string("src/test.txt").expect("Should have been able to read the file");
-    let rounds: Vec<(String, String)> = process_string(contents);
-    play_the_game(rounds);
+    let mut rounds: Vec<(String, String)> = process_string(contents);
+    play_the_game(&rounds);
+    convert_to_part_two(&mut rounds);
+    play_the_game(&rounds);
 }
 
 fn process_string(string: String) -> Vec<(String, String)> {
@@ -40,7 +49,7 @@ fn process_string(string: String) -> Vec<(String, String)> {
     rounds
 }
 
-fn play_the_game(rounds: Vec<(String, String)>) {
+fn play_the_game(rounds: &Vec<(String, String)>) {
     let mut points = 0;
 
     for round in rounds {
@@ -50,7 +59,7 @@ fn play_the_game(rounds: Vec<(String, String)>) {
     println!("The player gained {} points", points);
 }
 
-fn play_a_round((enemy, player): (String, String)) -> i32 {
+fn play_a_round((enemy, player): &(String, String)) -> i32 {
     let player = match player.as_str() {
         "X" => Move::Rock,
         "Y" => Move::Paper,
@@ -82,4 +91,40 @@ fn play_a_round((enemy, player): (String, String)) -> i32 {
             Move::Scisors => 3 + player.value(),
         },
     };
+}
+
+fn convert_to_part_two(rounds: &mut Vec<(String, String)>) {
+    for mut round in rounds {
+        let enemy = match round.0.as_str() {
+            "A" => Move::Rock,
+            "B" => Move::Paper,
+            "C" => Move::Scisors,
+            &_ => panic!("Enemy failed an action"),
+        };
+
+        let result = match round.1.as_str() {
+            "X" => Result::Loss,
+            "Y" => Result::Draw,
+            "Z" => Result::Victory,
+            &_ => panic!("Enemy failed an action"),
+        };
+
+        round.1 = match result {
+            Result::Loss => match enemy {
+                Move::Rock => String::from("Z"),
+                Move::Paper => String::from("X"),
+                Move::Scisors => String::from("Y"),
+            },
+            Result::Draw => match enemy {
+                Move::Rock => String::from("X"),
+                Move::Paper => String::from("Y"),
+                Move::Scisors => String::from("Z"),
+            },
+            Result::Victory => match enemy {
+                Move::Rock => String::from("Y"),
+                Move::Paper => String::from("Z"),
+                Move::Scisors => String::from("X"),
+            },
+        };
+    }
 }
