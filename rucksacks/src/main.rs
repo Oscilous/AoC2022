@@ -3,11 +3,13 @@ use std::fs;
 fn main() {
     let contents: String =
         fs::read_to_string("src/input.txt").expect("Should have been able to read the file");
-    let rucksacks = process_string(&contents);
-    calculate_priorities(&rucksacks);
+    let rucksacks = string_to_elves(&contents);
+    let groups = string_to_groups(&contents);
+    sum_of_priorities_per_elf(&rucksacks);
+    sum_of_priorities_per_group(&groups);
 }
 
-fn process_string(string: &String) -> Vec<(&str, &str)> {
+fn string_to_elves(string: &String) -> Vec<(&str, &str)> {
     let mut rucksacks = Vec::new();
     let string = string.split("\n");
 
@@ -18,18 +20,18 @@ fn process_string(string: &String) -> Vec<(&str, &str)> {
     rucksacks
 }
 
-fn calculate_priorities(rucksacks: &Vec<(&str, &str)>) {
+fn sum_of_priorities_per_elf(rucksacks: &Vec<(&str, &str)>) {
     let mut sum = 0;
 
     for rucksack in rucksacks {
-        let priority = search_shared_items(rucksack);
+        let priority = search_shared_items_per_elf(rucksack);
         sum += priority;
     }
 
     println!("The sum of the priorities is {}", sum);
 }
 
-fn search_shared_items(rucksack: &(&str, &str)) -> i32 {
+fn search_shared_items_per_elf(rucksack: &(&str, &str)) -> i32 {
     let mut item_types: Vec<char> = Vec::new();
     let left_pocket_items = rucksack.0.chars();
 
@@ -60,4 +62,48 @@ fn calculate_the_priority(item_types: Vec<char>) -> u8 {
     }
     //If the list is empty
     return 0;
+}
+
+fn sum_of_priorities_per_group(rucksacks: &Vec<(&str, &str, &str)>) {
+    let mut sum = 0;
+
+    for rucksack in rucksacks {
+        let priority = search_shared_item_per_group(rucksack);
+        sum += priority;
+    }
+
+    println!("The sum of the priorities is {}", sum);
+}
+
+fn string_to_groups(string: &String) -> Vec<(&str, &str, &str)> {
+    let mut groups = Vec::new();
+    let string: Vec<&str> = string.lines().collect();
+
+    for group in string.chunks(3) {
+        let group: Vec<&str> = group.to_vec();
+        let group = (group[0], group[1], group[2]);
+        groups.push(group);
+    }
+
+    groups
+}
+
+fn search_shared_item_per_group(group: &(&str, &str, &str)) -> i32 {
+    let mut item_types: Vec<char> = Vec::new();
+    let first_elf_items = group.0.chars();
+
+    for first_elf_item in first_elf_items {
+        let second_elf_items = group.1.chars();
+        for second_elf_item in second_elf_items {
+            let third_elf_items = group.2.chars();
+            for third_elf_item in third_elf_items {
+                if first_elf_item == second_elf_item && second_elf_item == third_elf_item {
+                    if !item_types.contains(&first_elf_item) {
+                        item_types.push(first_elf_item);
+                    }
+                }
+            }
+        }
+    }
+    calculate_the_priority(item_types) as i32
 }
