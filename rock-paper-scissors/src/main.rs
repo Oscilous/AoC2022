@@ -1,5 +1,3 @@
-//REDO MAKE THE CHOICES INTO ENUMS, as they can only be rock/paper/scissa
-
 use std::fs;
 
 enum Move {
