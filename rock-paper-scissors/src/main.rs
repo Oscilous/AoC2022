@@ -2,6 +2,21 @@
 
 use std::fs;
 
+enum Move {
+    Rock,
+    Paper,
+    Scisors,
+}
+
+impl Move {
+    fn value(&self) -> i32 {
+        match *self {
+            Move::Rock => 1,
+            Move::Paper => 2,
+            Move::Scisors => 3,
+        }
+    }
+}
 fn main() {
     let contents: String =
         fs::read_to_string("src/test.txt").expect("Should have been able to read the file");
@@ -37,35 +52,34 @@ fn play_the_game(rounds: Vec<(String, String)>) {
 
 fn play_a_round((enemy, player): (String, String)) -> i32 {
     let player = match player.as_str() {
-        "X" => 1,
-        "Y" => 2,
-        "Z" => 3,
+        "X" => Move::Rock,
+        "Y" => Move::Paper,
+        "Z" => Move::Scisors,
         &_ => panic!("Enemy failed an action"),
     };
 
     let enemy = match enemy.as_str() {
-        "A" => 1,
-        "B" => 2,
-        "C" => 3,
+        "A" => Move::Rock,
+        "B" => Move::Paper,
+        "C" => Move::Scisors,
         &_ => panic!("Enemy failed an action"),
     };
 
-    if player == enemy {
-        return 3 + player;
-    }
-
     return match player {
-        1 => match enemy {
-            2 => 0 + player,
-            3 => 6 + player,
+        Move::Rock => match enemy {
+            Move::Rock => 3 + player.value(),
+            Move::Paper => 0 + player.value(),
+            Move::Scisors => 6 + player.value(),
         },
-        2 => match enemy {
-            1 => 6 + player,
-            3 => 0 + player,
+        Move::Paper => match enemy {
+            Move::Rock => 6 + player.value(),
+            Move::Paper => 3 + player.value(),
+            Move::Scisors => 0 + player.value(),
         },
-        3 => match enemy {
-            1 => 0 + player,
-            2 => 6 + player,
+        Move::Scisors => match enemy {
+            Move::Rock => 0 + player.value(),
+            Move::Paper => 6 + player.value(),
+            Move::Scisors => 3 + player.value(),
         },
     };
 }
