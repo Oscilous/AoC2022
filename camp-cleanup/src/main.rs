@@ -20,9 +20,9 @@ fn compare_ranges(pairs: &Vec<String>) {
     let mut overlaping_range_amount = 0;
 
     for pair in pairs {
-        let pair = split_string_into_tuple(pair, ",");
-        let first_sectors = split_string_into_tuple(&pair.0, "-");
-        let second_sectors = split_string_into_tuple(&pair.1, "-");
+        let pair = split_string_into_str_tuple(pair, ",");
+        let first_sectors = split_string_into_u32_tuple(&pair.0, "-");
+        let second_sectors = split_string_into_u32_tuple(&pair.1, "-");
 
         if (first_sectors.0 >= second_sectors.0) && (first_sectors.1 <= second_sectors.1) {
             println!(
@@ -32,8 +32,8 @@ fn compare_ranges(pairs: &Vec<String>) {
             overlaping_range_amount += 1;
         } else if (first_sectors.0 <= second_sectors.0) && (first_sectors.1 >= second_sectors.1) {
             println!(
-                "Into {}<={} goes {}>={}",
-                first_sectors.0, second_sectors.0, first_sectors.1, second_sectors.1
+                "Into {}-{} goes {}-{}",
+                first_sectors.0, first_sectors.1, second_sectors.0, second_sectors.1
             );
             overlaping_range_amount += 1;
         }
@@ -42,13 +42,19 @@ fn compare_ranges(pairs: &Vec<String>) {
     println!("There are {} pairs", overlaping_range_amount);
 }
 
-fn split_string_into_tuple(input: &str, delimiter: &str) -> (String, String) {
+fn split_string_into_str_tuple(input: &str, delimiter: &str) -> (String, String) {
     let mut split_iter = input.split(delimiter);
     let first_part = split_iter.next().unwrap_or("");
     let second_part = split_iter.next().unwrap_or("");
     (first_part.to_string(), second_part.to_string())
 }
 
-fn string_tup_to_u32_tup((one, two): (String, String)) -> (u32, u32) {
-    (1, 1)
+fn split_string_into_u32_tuple(input: &str, delimiter: &str) -> (u32, u32) {
+    let mut split_iter = input.split(delimiter);
+    let first_part = split_iter.next().unwrap_or("");
+    let second_part = split_iter.next().unwrap_or("");
+    (
+        first_part.parse::<u32>().unwrap(),
+        second_part.parse::<u32>().unwrap(),
+    )
 }
