@@ -17,29 +17,32 @@ fn split_string(s: String) -> Vec<String> {
 }
 
 fn compare_ranges(pairs: &Vec<String>) {
-    let mut overlaping_range_amount = 0;
+    let mut overlap_fully_amount: i32 = 0;
+    let mut overlap_partially_amount: i32 = 0;
 
     for pair in pairs {
         let pair = split_string_into_str_tuple(pair, ",");
         let first_sectors = split_string_into_u32_tuple(&pair.0, "-");
         let second_sectors = split_string_into_u32_tuple(&pair.1, "-");
 
+        //Part one check
         if (first_sectors.0 >= second_sectors.0) && (first_sectors.1 <= second_sectors.1) {
-            println!(
-                "Fits {}-{} into {}-{}",
-                first_sectors.0, first_sectors.1, second_sectors.0, second_sectors.1
-            );
-            overlaping_range_amount += 1;
+            overlap_fully_amount += 1;
         } else if (first_sectors.0 <= second_sectors.0) && (first_sectors.1 >= second_sectors.1) {
+            overlap_fully_amount += 1;
+        }
+        //Part two check
+        if first_sectors.1 >= second_sectors.0 && first_sectors.0 <= second_sectors.1 {
             println!(
-                "Into {}-{} goes {}-{}",
+                "{}-{} and {}-{}",
                 first_sectors.0, first_sectors.1, second_sectors.0, second_sectors.1
             );
-            overlaping_range_amount += 1;
+            overlap_partially_amount += 1;
         }
     }
 
-    println!("There are {} pairs", overlaping_range_amount);
+    println!("There are {} pairs", overlap_fully_amount);
+    println!("There are {} pairs", overlap_partially_amount);
 }
 
 fn split_string_into_str_tuple(input: &str, delimiter: &str) -> (String, String) {
